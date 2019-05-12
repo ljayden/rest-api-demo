@@ -1,4 +1,4 @@
-package com.wonana.restapisample;
+package com.wonana.restapi;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;

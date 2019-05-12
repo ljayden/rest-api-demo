@@ -1,4 +1,4 @@
-package com.wonana.restapisample.common;
+package com.wonana.restapi.common;
 
 import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
 import org.springframework.boot.test.context.TestConfiguration;

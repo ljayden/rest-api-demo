@@ -1,4 +1,4 @@
-package com.wonana.restapisample.common;
+package com.wonana.restapi.common;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

@@ -1,4 +1,4 @@
-package com.wonana.restapisample.events;
+package com.wonana.restapi.events;
 
 public enum EventStatus {
 

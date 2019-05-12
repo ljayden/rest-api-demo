@@ -1,4 +1,4 @@
-package com.wonana.restapisample.events;
+package com.wonana.restapi.events;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;

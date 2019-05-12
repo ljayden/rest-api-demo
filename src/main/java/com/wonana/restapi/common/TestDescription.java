@@ -1,4 +1,4 @@
-package com.wonana.restapisample.common;
+package com.wonana.restapi.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

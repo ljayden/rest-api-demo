@@ -1,4 +1,4 @@
-package com.wonana.restapisample;
+package com.wonana.restapi;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

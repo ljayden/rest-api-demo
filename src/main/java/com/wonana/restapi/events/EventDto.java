@@ -1,4 +1,4 @@
-package com.wonana.restapisample.events;
+package com.wonana.restapi.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

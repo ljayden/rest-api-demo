@@ -1,6 +1,5 @@
-package com.wonana.restapisample.events;
+package com.wonana.restapi.events;
 
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
