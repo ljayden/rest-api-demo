@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.wonana</groupId>
-    <artifactId>rest-api-sample</artifactId>
+    <artifactId>rest-api-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>rest-api-sample</name>
+    <name>rest-api-demo</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <!--            <scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
