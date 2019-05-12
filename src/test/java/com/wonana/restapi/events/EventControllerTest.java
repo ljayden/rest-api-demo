@@ -13,15 +13,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -107,7 +108,7 @@ public class EventControllerTest {
                                 fieldWithPath("limitOfEnrollment").description("Name of new limitOfEnrollment")
                         ),
                         responseHeaders(
-                                headerWithName(HttpHeaders.LOCATION).description("location header"),
+                                headerWithName(HttpHeaders.LOCATION).description("저장된 이벤트의 위치"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("hal json type")
                         ),
 //                        responseFields(
@@ -119,7 +120,7 @@ public class EventControllerTest {
                                 fieldWithPath("closeEnrollmentDateTime").description("Name of new beginEnrollmentDateTime"),
                                 fieldWithPath("beginEventDateTime").description("Name of new beginEventDateTime"),
                                 fieldWithPath("endEventDateTime").description("Name of new endEventDateTime"),
-                                fieldWithPath("location").description("Name of new location"),
+                                fieldWithPath("location").description("저장된 이벤트의 위치"),
                                 fieldWithPath("basePrice").description("Name of new basePrice"),
                                 fieldWithPath("maxPrice").description("Name of new maxPrice"),
                                 fieldWithPath("limitOfEnrollment").description("Name of new limitOfEnrollment"),
@@ -219,12 +220,12 @@ public class EventControllerTest {
         IntStream.range(0, 30).forEach(i ->
                 this.genereteEvent(i));
 
-        // When
+        // When & Then
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/events")
-                    .param("page","1")
-                    .param("size","10")
-                    .param("sort","id,DESC")
-                )
+                .param("page","1")
+                .param("size","10")
+                .param("sort","id,DESC")
+        )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page").exists())
@@ -233,18 +234,77 @@ public class EventControllerTest {
                 .andExpect(jsonPath("_links.profile").exists())
                 .andDo(document("query-events"))
         ;
-
-
-        // Then
     }
 
-    private void genereteEvent(int i) {
+    @Test
+    @TestDescription("기존의 이벤트를 하나 조회하기")
+    public void getEvent() throws Exception {
+
+        // Given
+        Event event = this.genereteEvent(100);
+
+        // When & Then
+        this.mockMvc.perform(get("/api/events/{id}", event.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("get-an-event"))
+        ;
+    }
+
+    @Test
+    @TestDescription("없는 이벤트를 조회했을 때 404 응답받기")
+    public void getEvent404() throws Exception {
+
+        // When & Then
+        this.mockMvc.perform(get("/api/events/11883"))
+                .andExpect(status().isNotFound())
+        ;
+
+    }
+
+    @Test
+    @TestDescription("이벤트 수정")
+    public void updateEvent() throws Exception {
+
+        // Given
+        Event event = genereteEvent(100);
+        EventDto eventDto = EventDto.builder()
+                .name("수정수정")
+                .description("Rest API")
+                .location("제이든네 집")
+                .beginEnrollmentDateTime(LocalDateTime.of(2019,05,12,03,10))
+                .closeEnrollmentDateTime(LocalDateTime.of(2019,05,13,03,10))
+                .beginEventDateTime(LocalDateTime.of(2019,05,14,10,00))
+                .endEventDateTime(LocalDateTime.of(2019,05,14,12,00))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .build();
+
+        // When & Then
+        this.mockMvc.perform(post("/api/events/{id}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").value(Matchers.equalTo("수정수정")))
+                .andDo(document("update-an-event"))
+        ;
+    }
+
+    private Event genereteEvent(int i) {
         Event event = Event.builder()
                 .name("event "+i)
                 .description("test event")
                 .build();
 
         this.eventRepository.save(event);
+        return event;
     }
+
 
 }

@@ -14,13 +14,11 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -69,8 +67,43 @@ public class EventController {
         return ResponseEntity.ok(pagedResources);
     }
 
+    @GetMapping("/{id}")
+    public  ResponseEntity getEvent(@PathVariable Integer id) {
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+
+        if (optionalEvent.isPresent() == true) {
+            EventResource eventResource = new EventResource(optionalEvent.get());
+            eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+            return ResponseEntity.ok(eventResource);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     private ResponseEntity badRequest(Errors errors) {
         return ResponseEntity.badRequest().body(new ErrorsResource(errors));
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody EventDto eventDto) {
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+
+        if (optionalEvent.isPresent() == true) {
+
+            System.out.println("있음");
+            Event event = optionalEvent.get();
+            event.setName(eventDto.getName());
+            event.setDescription(eventDto.getDescription());
+            Event savedEvent = this.eventRepository.save(event);
+
+            EventResource eventResource = new EventResource(savedEvent);
+            eventResource.add(new Link("/docs/index.html#update-an-event").withRel("profile"));
+            return ResponseEntity.ok(eventResource);
+        } else {
+            System.out.println("없음");
+            return ResponseEntity.status(500).build();
+        }
+
     }
 
 
