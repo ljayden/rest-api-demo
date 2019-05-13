@@ -80,30 +80,36 @@ public class EventController {
         }
     }
 
-    private ResponseEntity badRequest(Errors errors) {
-        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
-    }
-
-    @PostMapping("/{id}")
-    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody EventDto eventDto) {
+    @PutMapping("/{id}")
+    public ResponseEntity updateEvent(@PathVariable Integer id,
+                                      @RequestBody @Valid EventDto eventDto,
+                                      Errors errors) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
-
-        if (optionalEvent.isPresent() == true) {
-
-            System.out.println("있음");
-            Event event = optionalEvent.get();
-            event.setName(eventDto.getName());
-            event.setDescription(eventDto.getDescription());
-            Event savedEvent = this.eventRepository.save(event);
-
-            EventResource eventResource = new EventResource(savedEvent);
-            eventResource.add(new Link("/docs/index.html#update-an-event").withRel("profile"));
-            return ResponseEntity.ok(eventResource);
-        } else {
-            System.out.println("없음");
-            return ResponseEntity.status(500).build();
+        if( optionalEvent.isEmpty() ){
+            return ResponseEntity.notFound().build();
         }
 
+        if(errors.hasErrors()){
+            return badRequest(errors);
+        }
+        this.eventValidator.validate(eventDto, errors);
+        if(errors.hasErrors()){
+            return badRequest(errors);
+        }
+
+        Event existingEvent = optionalEvent.get();
+        this.modelMapper.map(eventDto, existingEvent);
+        Event savedEvent = this.eventRepository.save(existingEvent);
+
+        EventResource eventResource = new EventResource(savedEvent);
+        eventResource.add(new Link("/docs/index.html#resource-update-evbent").withRel("profile"));
+
+        return ResponseEntity.ok(eventResource);
+
+    }
+
+    private ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
 
 
