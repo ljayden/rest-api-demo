@@ -1,6 +1,7 @@
 package com. wonana.restapi.index;
 
 import com.wonana.restapi.events.EventController;
+import lombok.var;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,6 +1,7 @@
 package com.wonana.restapi.events;
 
 import com.wonana.restapi.common.ErrorsResource;
+import lombok.var;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -85,7 +86,7 @@ public class EventController {
                                       @RequestBody @Valid EventDto eventDto,
                                       Errors errors) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
-        if( optionalEvent.isEmpty() ){
+        if( !optionalEvent.isPresent() ){
             return ResponseEntity.notFound().build();
         }
 
